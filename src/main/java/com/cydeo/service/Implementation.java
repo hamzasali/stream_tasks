@@ -6,8 +6,9 @@ import com.cydeo.model.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import static com.cydeo.service.DataGenerator.findUserById;
+import static com.cydeo.service.DataGenerator.*;
 
 
 public class Implementation {
@@ -19,8 +20,9 @@ public class Implementation {
      * @return all the student users {@link User} and {@link Role}
      */
     public static List<User> readAllStudents() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getRole().getName().equals("STUDENT"))
+                .collect(Collectors.toList());
     }
 
 
@@ -31,8 +33,9 @@ public class Implementation {
      */
 
     public static List<User> readAllAdmins() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getRole().getName().equals("ADMIN"))
+                .collect(Collectors.toList());
 
     }
 
@@ -42,8 +45,9 @@ public class Implementation {
      * @return all the manager users {@link User} and {@link Role}
      */
     public static List<User> readAllManagers() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getRole().getName().equalsIgnoreCase("MANAGER"))
+                .collect(Collectors.toList());
 
     }
 
@@ -53,8 +57,9 @@ public class Implementation {
      * @return all the suspended users {@link User} and {@link UserState}
      */
     public static List<User> readAllSuspendedUsers() {
-        //TODO
-        return null;
+       return fillUsers().stream()
+               .filter(user -> user.getState().equals(UserState.SUSPENDED))
+               .collect(Collectors.toList());
     }
 
     /**
@@ -63,8 +68,9 @@ public class Implementation {
      * @return all the confirmed users {@link User} and {@link UserState}
      */
     public static List<User> readAllConfirmedUsers() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getState().equals(UserState.CONFIRMED))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -73,8 +79,9 @@ public class Implementation {
      * @return all the pending users {@link User} and {@link UserState}
      */
     public static List<User> readAllPendingUsers() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getState().equals(UserState.PENDING))
+                .collect(Collectors.toList());
     }
 
 
@@ -84,8 +91,8 @@ public class Implementation {
      * @return number of courses {@link Course}
      */
     public static Long countCourses() {
-        //TODO
-        return null;
+        return fillCourses().stream()
+                .count();
 
     }
 
@@ -96,8 +103,8 @@ public class Implementation {
      * @return sum of duration {@link Course}.
      */
     public static Integer sumDurationForAllData() {
-        //TODO
-        return null;
+        return fillCourses().stream()
+                .collect(Collectors.summingInt(Course::getDuration));
     }
 
     /**
@@ -108,8 +115,11 @@ public class Implementation {
      */
     public static List<Course> findCoursesByUserId(Integer id) {
         User specificUser = findUserById(id);
-        //TODO
-        return null;
+
+        return fillCoursesAssigned().stream()
+                .filter(course -> course.getCourse().equals(specificUser))
+                .map(CourseAssigned::getCourse)
+                .collect(Collectors.toList());
     }
 
 
@@ -121,8 +131,10 @@ public class Implementation {
      * @return converted duration to week. {@link BigDecimal}
      */
     public static Integer divideToWeek(Integer id) {
-        //TODO
-        return null;
+        return fillCoursesAssigned().stream()
+                .filter(courseAssigned -> courseAssigned.getUser().equals(findCourseById(id)))
+                .map(courseAssigned -> courseAssigned.getCourse().getDuration()/40)
+                .findFirst().get();
 
     }
 
