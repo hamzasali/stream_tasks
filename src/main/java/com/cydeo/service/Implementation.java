@@ -4,8 +4,7 @@ package com.cydeo.service;
 import com.cydeo.model.*;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.cydeo.service.DataGenerator.*;
@@ -137,18 +136,8 @@ public class Implementation {
                 .map(courseAssigned -> courseAssigned.getCourse().getDuration())
 //                .map(CourseAssigned::getCourse)
 //                .map(Course::getDuration)
-                .reduce((a, b)-> (a+b)/40).get();
-//                .mapToInt(Integer::intValue).sum()/40;
+                .reduce(0,(a, b) -> (a + b) / 40);
 
-//        User specificUser = findUserById(id);
-//        return fillCoursesAssigned().stream()
-//                .filter(p->p.getUser().equals(specificUser))
-//                .map(p->p.getCourse().getDuration())
-//                .reduce((a,b)->{
-//                    int sum=a+b;
-//                    return sum/40;
-//                })
-//                .get();
 
     }
 
@@ -160,8 +149,8 @@ public class Implementation {
      * {@link CourseStatus}
      */
     public static Map<CourseStatus, Long> countCoursesByStatus() {
-        //TODO
-                return null;
+        return fillCoursesAssigned().stream()
+                .collect(Collectors.groupingBy(CourseAssigned::getStatus, Collectors.counting()));
     }
 
     /**
@@ -172,8 +161,17 @@ public class Implementation {
      */
 
     public static Map<String, Integer> getMinMaxCourseDuration() {
-        //TODO
-        return null;
+        return fillCourses().stream()
+                .collect(Collectors.teeing(
+                        Collectors.maxBy(Comparator.comparing(Course::getDuration)),
+                        Collectors.minBy(Comparator.comparing(Course::getDuration)),
+                        (max, min) -> {
+                            Map<String, Integer> result = new LinkedHashMap<>();
+                            result.put("Max Duration", max.get().getDuration());
+                            result.put("Min Duration", min.get().getDuration());
+                            return result;
+                        }
+                ));
     }
 
     /**
@@ -183,8 +181,9 @@ public class Implementation {
      * @return the first user depending on first name
      */
     public static User findFirstWithFirstName() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getFirstName().startsWith("J"))
+                .findFirst().get();
     }
 
     /**
@@ -195,8 +194,9 @@ public class Implementation {
      * @return the first user depending on first name
      */
     public static User findAnyWithLastName() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .filter(user -> user.getLastName().equals("Wooden"))
+                .findAny().orElseThrow(() -> new NoSuchElementException("No user exists"));
     }
 
     /**
@@ -206,8 +206,8 @@ public class Implementation {
      * @return map
      */
     public static Map<Boolean, List<User>> partitionOfConfirmedUsers() {
-        //TODO
-        return null;
+        return fillUsers().stream()
+                .collect(Collectors.partitioningBy(user -> user.getState().equals(UserState.CONFIRMED)));
     }
 
     /**
@@ -218,7 +218,7 @@ public class Implementation {
      */
 
     public static Map<CourseStatus, List<CourseAssigned>> groupOfCourseAssigned() {
-        //TODO
-        return null;
+        return fillCoursesAssigned().stream()
+                .collect(Collectors.groupingBy(CourseAssigned::getStatus));
     }
 }
