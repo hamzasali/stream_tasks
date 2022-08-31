@@ -57,9 +57,9 @@ public class Implementation {
      * @return all the suspended users {@link User} and {@link UserState}
      */
     public static List<User> readAllSuspendedUsers() {
-       return fillUsers().stream()
-               .filter(user -> user.getState().equals(UserState.SUSPENDED))
-               .collect(Collectors.toList());
+        return fillUsers().stream()
+                .filter(user -> user.getState().equals(UserState.SUSPENDED))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -117,7 +117,8 @@ public class Implementation {
         User specificUser = findUserById(id);
 
         return fillCoursesAssigned().stream()
-                .filter(course -> course.getCourse().equals(specificUser))
+
+                .filter(course -> course.getUser().equals(specificUser))
                 .map(CourseAssigned::getCourse)
                 .collect(Collectors.toList());
     }
@@ -132,9 +133,22 @@ public class Implementation {
      */
     public static Integer divideToWeek(Integer id) {
         return fillCoursesAssigned().stream()
-                .filter(courseAssigned -> courseAssigned.getUser().equals(findCourseById(id)))
-                .map(courseAssigned -> courseAssigned.getCourse().getDuration()/40)
-                .findFirst().get();
+                .filter(courseAssigned -> courseAssigned.getUser().equals(findUserById(id)))
+                .map(courseAssigned -> courseAssigned.getCourse().getDuration())
+//                .map(CourseAssigned::getCourse)
+//                .map(Course::getDuration)
+                .reduce((a, b)-> (a+b)/40).get();
+//                .mapToInt(Integer::intValue).sum()/40;
+
+//        User specificUser = findUserById(id);
+//        return fillCoursesAssigned().stream()
+//                .filter(p->p.getUser().equals(specificUser))
+//                .map(p->p.getCourse().getDuration())
+//                .reduce((a,b)->{
+//                    int sum=a+b;
+//                    return sum/40;
+//                })
+//                .get();
 
     }
 
@@ -147,7 +161,7 @@ public class Implementation {
      */
     public static Map<CourseStatus, Long> countCoursesByStatus() {
         //TODO
-        return null;
+                return null;
     }
 
     /**
